@@ -1,0 +1,18 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "./design-system/foundations/tokens.css";
+@import "./design-system/foundations/typography.css";
+@import "./design-system/foundations/reset.css";
+
+/* The car photo is the imagery; the chrome steps out of the way.
+   Smooth, opaque scroll surface. */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Hide native number-input spinners (price filter fields use inputMode numeric). */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
