@@ -1,6 +1,8 @@
+"use client";
+
 import * as React from "react";
 
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 import { Camera, ChevronLeft, ChevronRight, MessageCircle, Search } from "lucide-react";
 
 import { Button } from "@/design-system/primitives/button";
@@ -11,9 +13,70 @@ import { SLIDES } from "./slides";
 
 const INTERVAL = 5200;
 
-export function Carousel() {
-  const [slide, setSlide] = React.useState(0);
+function HeroContent() {
   const { openContact } = useContact();
+  return (
+    <>
+      <h1 className="mt-4 max-w-xl text-4xl font-bold leading-[1.1] tracking-tight text-white text-balance sm:text-5xl">
+        O seu próximo carro começa aqui
+      </h1>
+      <p className="mt-4 max-w-lg text-base text-white/80">
+        Seminovos selecionados, vistoriados e com procedência garantida. Visite a loja ou fale com
+        um consultor agora.
+      </p>
+      <div className="mt-7 flex flex-wrap gap-3">
+        <Button size="lg" asChild>
+          <Link href="/estoque">
+            <Search /> Ver estoque completo
+          </Link>
+        </Button>
+        <Button
+          size="lg"
+          variant="outline"
+          onClick={() => openContact()}
+          className="border-white/35 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+        >
+          <MessageCircle /> Falar com consultor
+        </Button>
+      </div>
+    </>
+  );
+}
+
+interface HomeHeroProps {
+  bannerUrl: string | null;
+  tradeName: string;
+}
+
+/**
+ * Hero da landing: banner real da loja quando configurado; senão, o
+ * carrossel de cenas ilustradas (placeholder do visual original).
+ */
+export function HomeHero({ bannerUrl, tradeName }: HomeHeroProps) {
+  if (bannerUrl) {
+    return (
+      <div className="relative h-[clamp(420px,62vh,600px)] w-full overflow-hidden bg-foreground">
+        <div className="absolute inset-0 overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={bannerUrl}
+            alt={tradeName}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent" />
+        </div>
+        <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-center px-4 sm:px-6 lg:px-8">
+          <HeroContent />
+        </div>
+      </div>
+    );
+  }
+
+  return <Carousel />;
+}
+
+function Carousel() {
+  const [slide, setSlide] = React.useState(0);
   const timerRef = React.useRef<number | null>(null);
 
   const reset = React.useCallback(() => {
@@ -55,32 +118,7 @@ export function Carousel() {
                 {sl.label}
               </span>
 
-              {i === 0 && (
-                <>
-                  <h1 className="mt-4 max-w-xl text-4xl font-bold leading-[1.1] tracking-tight text-white text-balance sm:text-5xl">
-                    O seu próximo carro começa aqui
-                  </h1>
-                  <p className="mt-4 max-w-lg text-base text-white/80">
-                    Seminovos selecionados, vistoriados e com procedência garantida. Visite o pátio
-                    ou fale com um consultor agora.
-                  </p>
-                  <div className="mt-7 flex flex-wrap gap-3">
-                    <Button size="lg" asChild>
-                      <Link to="/estoque">
-                        <Search /> Ver estoque completo
-                      </Link>
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      onClick={() => openContact()}
-                      className="border-white/35 bg-white/10 text-white hover:bg-white/20 hover:text-white"
-                    >
-                      <MessageCircle /> Falar com consultor
-                    </Button>
-                  </div>
-                </>
-              )}
+              {i === 0 && <HeroContent />}
             </div>
           </div>
         ))}

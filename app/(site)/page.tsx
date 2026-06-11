@@ -1,0 +1,217 @@
+import Link from "next/link";
+
+import {
+  ArrowRight,
+  Banknote,
+  CalendarCheck,
+  Car,
+  Handshake,
+  MapPin,
+  ShieldCheck,
+  type LucideIcon,
+} from "lucide-react";
+
+import { HomeHero } from "@/components/landing/Carousel";
+import { VehicleCard } from "@/components/vehicle/VehicleCard";
+import { IconBadge } from "@/design-system/patterns/IconBadge";
+import { Button } from "@/design-system/primitives/button";
+import { getSlug, getStorefront, getVehicles } from "@/lib/api";
+import { formatNumber } from "@/lib/format";
+
+const WHY_ITEMS: { icon: LucideIcon; title: string; body: string }[] = [
+  {
+    icon: ShieldCheck,
+    title: "Vistoria cautelar",
+    body: "Todos os veículos passam por inspeção técnica detalhada antes de entrar na loja.",
+  },
+  {
+    icon: CalendarCheck,
+    title: "3 meses de garantia",
+    body: "Garantia contratual de 3 meses para motor e câmbio.",
+  },
+  {
+    icon: Banknote,
+    title: "Financiamento facilitado",
+    body: "Parcerias com as principais financeiras. Taxa a partir de 0,99%/mês sujeita à análise.",
+  },
+  {
+    icon: Handshake,
+    title: "Procedência garantida",
+    body: "Histórico completo: FIPE, multas, recalls e registro de proprietários anteriores.",
+  },
+];
+
+export default async function LandingPage() {
+  const slug = await getSlug();
+  const [storefront, list] = await Promise.all([
+    getStorefront(slug),
+    getVehicles(slug, { size: 3, page: 0 }),
+  ]);
+
+  const tradeName = storefront?.tradeName ?? "nossa loja";
+  const total = list?.metadata.totalElements ?? 0;
+  const featured = list?.content ?? [];
+
+  return (
+    <div>
+      <HomeHero bannerUrl={storefront?.bannerUrl ?? null} tradeName={tradeName} />
+
+      {/* Stats strip */}
+      <div className="bg-primary text-primary-foreground">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-10 gap-y-6 px-4 py-8 sm:px-6 lg:justify-between lg:px-8">
+          <div className="flex items-center gap-3">
+            <span className="flex size-12 items-center justify-center rounded-2xl bg-white/15">
+              <Car className="size-5" />
+            </span>
+            <div>
+              <div className="num text-2xl font-bold tracking-tight">{formatNumber(total)}</div>
+              <div className="text-sm text-primary-foreground/80">
+                {total === 1 ? "veículo em estoque" : "veículos em estoque"}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="flex size-12 items-center justify-center rounded-2xl bg-white/15">
+              <ShieldCheck className="size-5" />
+            </span>
+            <div>
+              <div className="text-2xl font-bold tracking-tight">Procedência</div>
+              <div className="text-sm text-primary-foreground/80">histórico verificado</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="flex size-12 items-center justify-center rounded-2xl bg-white/15">
+              <Banknote className="size-5" />
+            </span>
+            <div>
+              <div className="text-2xl font-bold tracking-tight">Financiamento</div>
+              <div className="text-sm text-primary-foreground/80">sujeito à análise do banco</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="flex size-12 items-center justify-center rounded-2xl bg-white/15">
+              <Handshake className="size-5" />
+            </span>
+            <div>
+              <div className="text-2xl font-bold tracking-tight">Troca e compra</div>
+              <div className="text-sm text-primary-foreground/80">avaliamos o seu usado</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sobre a loja */}
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+              A loja
+            </span>
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-balance sm:text-3xl">
+              Conectando pessoas ao carro certo
+            </h2>
+            <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground">
+              <p>
+                A {tradeName} trabalha com uma ideia simples: tornar a compra de um seminovo tão
+                tranquila quanto comprar um carro zero — com transparência de preço, histórico
+                completo do veículo e suporte real no pós-venda.
+              </p>
+              <p>
+                Cada carro que entra na loja passa por vistoria cautelar, laudo de procedência e
+                limpeza completa. Sem histórico de sinistro grave, sem pendências de documentação.
+              </p>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild>
+                <Link href="/estoque">Conheça o estoque</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/onde-estamos">
+                  <MapPin /> Como chegar
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            {WHY_ITEMS.map((item) => (
+              <div key={item.title} className="rounded-xl border border-border bg-card p-6 shadow-sm">
+                <IconBadge variant="primary" size="md">
+                  <item.icon />
+                </IconBadge>
+                <h3 className="mt-4 font-semibold tracking-tight">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Em destaque */}
+      <section className="bg-sidebar">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                Em destaque
+              </span>
+              <h2 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
+                Veículos selecionados
+              </h2>
+            </div>
+            <Button variant="outline" asChild>
+              <Link href="/estoque">
+                Ver todos os {total > 0 ? formatNumber(total) : ""} disponíveis
+                <ArrowRight />
+              </Link>
+            </Button>
+          </div>
+          {featured.length > 0 ? (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {featured.map((v) => (
+                <VehicleCard key={v.publicId} vehicle={v} />
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-xl border border-dashed border-border bg-card/50 px-6 py-10 text-center text-sm text-muted-foreground">
+              O estoque está sendo atualizado. Volte em breve ou fale com a loja.
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* CTA banner */}
+      <section className="bg-foreground text-background">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-6 px-4 py-14 sm:px-6 lg:px-8">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+              Quer vender ou trocar seu carro?
+            </h2>
+            <p className="mt-2 text-background/70">
+              Avaliamos em 24h. Compramos à vista ou aceitamos como entrada.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Button
+              size="lg"
+              asChild
+              className="bg-background text-foreground hover:bg-background/90"
+            >
+              <Link href="/vender">
+                <Car /> Vender meu carro
+              </Link>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              asChild
+              className="border-background/35 bg-transparent text-background hover:bg-background/10 hover:text-background"
+            >
+              <Link href="/estoque">Ver estoque</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

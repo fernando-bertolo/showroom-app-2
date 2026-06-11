@@ -23,6 +23,7 @@ export const sellFormSchema = z.object({
   estado: estadoSchema,
   unicoDono: simNaoSchema,
   docOk: docSchema,
+  precoDesejado: z.string().trim().optional(),
   // Passo 4 — contato
   nome: z.string().trim().min(2, "Informe seu nome"),
   telefone: z
@@ -32,6 +33,8 @@ export const sellFormSchema = z.object({
     .regex(phoneRegex, "Telefone inválido, ex: (11) 99999-9999"),
   email: z.union([z.string().trim().email("E-mail inválido"), z.literal("")]).optional(),
   cidade: z.string().trim().min(1, "Informe a cidade"),
+  /** Honeypot — campo oculto que humano não preenche. */
+  website: z.string().optional(),
 });
 
 export type SellFormValues = z.infer<typeof sellFormSchema>;
@@ -40,6 +43,21 @@ export type SellFormValues = z.infer<typeof sellFormSchema>;
 export const SELL_STEP_FIELDS: (keyof SellFormValues)[][] = [
   ["marca", "modelo", "ano"],
   ["versao", "km", "cambio"],
-  ["estado", "unicoDono", "docOk"],
+  ["estado", "unicoDono", "docOk", "precoDesejado"],
   ["nome", "telefone", "cidade", "email"],
 ];
+
+/** Body do POST /showroom/{slug}/sell-offers. */
+export interface SellOfferPayload {
+  customerName: string;
+  customerPhone?: string;
+  customerEmail?: string;
+  brand: string;
+  model: string;
+  version?: string;
+  modelYear?: number;
+  mileage?: number;
+  askingPrice?: number;
+  notes?: string;
+  website?: string;
+}

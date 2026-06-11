@@ -1,55 +1,75 @@
+"use client";
+
 import * as React from "react";
 
-const STORAGE_KEY = "patio:favorites";
+import type { VehicleSummary } from "@/types/vehicle";
+
+/**
+ * Favoritos no localStorage. Armazenamos o RESUMO do veículo (não só o id)
+ * para a página /favoritos renderizar sem precisar de endpoint batch.
+ */
+const STORAGE_KEY = "patio:favorites:v2";
 
 interface FavoritesContextValue {
-  favorites: Set<string>;
-  isFavorite: (id: string) => boolean;
-  toggle: (id: string) => void;
+  favorites: VehicleSummary[];
+  isFavorite: (publicId: string) => boolean;
+  toggle: (vehicle: VehicleSummary) => void;
   count: number;
 }
 
 const FavoritesContext = React.createContext<FavoritesContextValue | null>(null);
 
-function readStored(): Set<string> {
-  if (typeof window === "undefined") return new Set();
+function readStored(): VehicleSummary[] {
+  if (typeof window === "undefined") return [];
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return new Set();
+    if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
-    if (Array.isArray(parsed)) return new Set(parsed.filter((x): x is string => typeof x === "string"));
+    if (Array.isArray(parsed)) {
+      return parsed.filter(
+        (x): x is VehicleSummary =>
+          typeof x === "object" && x !== null && typeof (x as VehicleSummary).publicId === "string",
+      );
+    }
   } catch {
     /* ignore */
   }
-  return new Set();
+  return [];
 }
 
 export function FavoritesProvider({ children }: { children: React.ReactNode }) {
-  const [favorites, setFavorites] = React.useState<Set<string>>(readStored);
+  // Começa vazio no SSR; hidrata do localStorage após montar.
+  const [favorites, setFavorites] = React.useState<VehicleSummary[]>([]);
+  const [hydrated, setHydrated] = React.useState(false);
 
   React.useEffect(() => {
+    setFavorites(readStored());
+    setHydrated(true);
+  }, []);
+
+  React.useEffect(() => {
+    if (!hydrated) return;
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify([...favorites]));
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
     } catch {
       /* ignore */
     }
-  }, [favorites]);
+  }, [favorites, hydrated]);
 
-  const toggle = React.useCallback((id: string) => {
+  const toggle = React.useCallback((vehicle: VehicleSummary) => {
     setFavorites((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
+      const exists = prev.some((v) => v.publicId === vehicle.publicId);
+      if (exists) return prev.filter((v) => v.publicId !== vehicle.publicId);
+      return [...prev, vehicle];
     });
   }, []);
 
   const value = React.useMemo<FavoritesContextValue>(
     () => ({
       favorites,
-      isFavorite: (id: string) => favorites.has(id),
+      isFavorite: (publicId: string) => favorites.some((v) => v.publicId === publicId),
       toggle,
-      count: favorites.size,
+      count: favorites.length,
     }),
     [favorites, toggle],
   );

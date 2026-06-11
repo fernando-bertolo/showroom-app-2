@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 
 type Theme = "light" | "dark";
@@ -19,7 +21,13 @@ function readStored(): Theme {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = React.useState<Theme>(readStored);
+  // Começa em "light" no SSR; sincroniza com o localStorage após montar
+  // (o script inline no <head> já aplicou a classe .dark antes do paint).
+  const [theme, setTheme] = React.useState<Theme>("light");
+
+  React.useEffect(() => {
+    setTheme(readStored());
+  }, []);
 
   React.useEffect(() => {
     const root = document.documentElement;

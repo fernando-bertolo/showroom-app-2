@@ -29,7 +29,7 @@ export const SLIDES: Slide[] = [
         <rect x="480" y="300" width="240" height="100" fill="oklch(0.65 0.14 225)" opacity=".75" rx="4" />
         <rect x="440" y="88" width="320" height="50" fill="oklch(0.48 0.18 255)" rx="8" />
         <text x="600" y="121" textAnchor="middle" fill="white" fontSize="28" fontWeight="700" fontFamily="sans-serif" letterSpacing="-0.5">
-          PÁTIO
+          LOJA
         </text>
         <ellipse cx="540" cy="385" rx="70" ry="22" fill="oklch(0.25 0.04 265)" opacity=".5" />
         <rect x="490" y="356" width="100" height="30" fill="oklch(0.55 0.1 225)" rx="14" />
@@ -77,13 +77,13 @@ export const SLIDES: Slide[] = [
         <ellipse cx="960" cy="432" rx="30" ry="30" fill="oklch(0.2 0.02 265)" />
         <rect x="500" y="80" width="200" height="56" fill="oklch(0.48 0.18 255)" rx="8" opacity=".9" />
         <text x="600" y="116" textAnchor="middle" fill="white" fontSize="26" fontWeight="700" fontFamily="sans-serif">
-          PÁTIO
+          LOJA
         </text>
       </svg>
     ),
   },
   {
-    label: "Pátio externo — estoque ao ar livre",
+    label: "Área externa — estoque ao ar livre",
     scene: (
       <svg viewBox="0 0 1200 560" xmlns="http://www.w3.org/2000/svg" style={sceneStyle} preserveAspectRatio="xMidYMid slice">
         <defs>

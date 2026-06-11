@@ -1,46 +1,52 @@
+"use client";
+
 import * as React from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MessageCircle, Phone, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 
+import { postLead } from "@/components/contact/LeadForm";
 import { Field } from "@/components/form/Field";
 import { VehiclePhoto } from "@/components/vehicle/VehiclePhoto";
 import { Button } from "@/design-system/primitives/button";
 import { Input } from "@/design-system/primitives/input";
 import { Textarea } from "@/design-system/primitives/textarea";
-import { useSubmitContact } from "@/hooks/useVehicles";
-import { formatCurrencyBRL } from "@/lib/format";
+import { formatCurrencyBRL, telHref, waHref } from "@/lib/format";
 import { useContact } from "@/stores/contact";
 import { useToast } from "@/stores/toast";
-import { contactFormSchema, type ContactFormValues } from "@/types/contact";
+import { leadFormSchema, type LeadFormValues } from "@/types/contact";
 
-export function ContactDrawer() {
+interface ContactDrawerProps {
+  whatsapp: string | null;
+  phone: string | null;
+}
+
+export function ContactDrawer({ whatsapp, phone }: ContactDrawerProps) {
   const { open, vehicle, closeContact } = useContact();
   const { notify } = useToast();
-  const submitContact = useSubmitContact();
+  const [submitError, setSubmitError] = React.useState<string | null>(null);
 
-  const defaultMessage = vehicle
-    ? `Olá! Tenho interesse no ${vehicle.marca} ${vehicle.modelo} ${vehicle.versao}.`
-    : "";
+  const defaultMessage = vehicle ? `Olá! Tenho interesse no ${vehicle.name}.` : "";
 
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<ContactFormValues>({
-    resolver: zodResolver(contactFormSchema),
-    defaultValues: { nome: "", telefone: "", email: "", mensagem: defaultMessage },
+  } = useForm<LeadFormValues>({
+    resolver: zodResolver(leadFormSchema),
+    defaultValues: { name: "", phone: "", email: "", message: defaultMessage, website: "" },
   });
 
   // Reseta a mensagem ao abrir o drawer (pode trazer outro veículo).
   React.useEffect(() => {
     if (open) {
-      reset({ nome: "", telefone: "", email: "", mensagem: defaultMessage });
+      setSubmitError(null);
+      reset({ name: "", phone: "", email: "", message: defaultMessage, website: "" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, vehicle?.id]);
+  }, [open, vehicle?.publicId]);
 
   // Fecha com Escape e trava o scroll do corpo.
   React.useEffect(() => {
@@ -60,15 +66,22 @@ export function ContactDrawer() {
   if (!open) return null;
 
   const onSubmit = handleSubmit(async (values) => {
-    await submitContact.mutateAsync({
-      nome: values.nome,
-      telefone: values.telefone,
-      email: values.email || undefined,
-      mensagem: values.mensagem,
-      vehicleId: vehicle?.id,
-    });
-    closeContact();
-    notify("Mensagem enviada — vamos te chamar em instantes.");
+    setSubmitError(null);
+    try {
+      const result = await postLead({
+        name: values.name,
+        phone: values.phone,
+        email: values.email || undefined,
+        message: values.message,
+        vehiclePublicId: vehicle?.publicId,
+        source: "CONTACT",
+        website: values.website ?? "",
+      });
+      closeContact();
+      notify(`Mensagem enviada — protocolo #${result.protocol}. Vamos te chamar em instantes.`);
+    } catch {
+      setSubmitError("Não foi possível enviar agora. Tente novamente em instantes.");
+    }
   });
 
   return (
@@ -97,72 +110,101 @@ export function ContactDrawer() {
           onSubmit={onSubmit}
           className="flex flex-1 flex-col gap-4 overflow-y-auto px-5 py-5"
         >
+          {/* Honeypot anti-spam: invisível para humanos. */}
+          <input
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="absolute -left-[9999px] h-0 w-0 opacity-0"
+            {...register("website")}
+          />
+
           {vehicle && (
             <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/[0.04] p-3">
               <div className="h-10 w-14 shrink-0 overflow-hidden rounded-md">
-                <VehiclePhoto vehicle={vehicle} iconClassName="size-4" />
+                {vehicle.coverImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={vehicle.coverImage}
+                    alt={vehicle.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <VehiclePhoto seed={vehicle.publicId} iconClassName="size-4" />
+                )}
               </div>
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold">
-                  {vehicle.marca} {vehicle.modelo} {vehicle.versao}
-                </p>
+                <p className="truncate text-sm font-semibold">{vehicle.name}</p>
                 <p className="num text-xs text-muted-foreground">
-                  {vehicle.ano}/{vehicle.anoModelo} · {formatCurrencyBRL(vehicle.preco)}
+                  {vehicle.manufacturerYear}/{vehicle.modelYear} ·{" "}
+                  {formatCurrencyBRL(vehicle.salePrice)}
                 </p>
               </div>
             </div>
           )}
 
-          <div>
-            <p className="mb-2 text-xs text-muted-foreground">
-              Resposta direta no canal de sua preferência:
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              <a
-                href="https://wa.me/5511999990000"
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-2 rounded-md border border-border p-2.5 transition-colors hover:bg-accent"
-              >
-                <MessageCircle className="size-5 text-[oklch(0.6_0.14_145)]" />
-                <span className="min-w-0">
-                  <span className="block text-sm font-medium">WhatsApp</span>
-                  <span className="block text-xs text-muted-foreground">Resposta em minutos</span>
-                </span>
-              </a>
-              <a
-                href="tel:+551130000000"
-                className="flex items-center gap-2 rounded-md border border-border p-2.5 transition-colors hover:bg-accent"
-              >
-                <Phone className="size-5 text-primary" />
-                <span className="min-w-0">
-                  <span className="block text-sm font-medium">Ligar</span>
-                  <span className="block text-xs text-muted-foreground">Seg–Sáb · 9h às 19h</span>
-                </span>
-              </a>
+          {(whatsapp || phone) && (
+            <div>
+              <p className="mb-2 text-xs text-muted-foreground">
+                Resposta direta no canal de sua preferência:
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {whatsapp && (
+                  <a
+                    href={waHref(
+                      whatsapp,
+                      vehicle ? `Olá! Tenho interesse no ${vehicle.name}.` : undefined,
+                    )}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-2 rounded-md border border-border p-2.5 transition-colors hover:bg-accent"
+                  >
+                    <MessageCircle className="size-5 text-[oklch(0.6_0.14_145)]" />
+                    <span className="min-w-0">
+                      <span className="block text-sm font-medium">WhatsApp</span>
+                      <span className="block text-xs text-muted-foreground">
+                        Resposta em minutos
+                      </span>
+                    </span>
+                  </a>
+                )}
+                {phone && (
+                  <a
+                    href={telHref(phone)}
+                    className="flex items-center gap-2 rounded-md border border-border p-2.5 transition-colors hover:bg-accent"
+                  >
+                    <Phone className="size-5 text-primary" />
+                    <span className="min-w-0">
+                      <span className="block text-sm font-medium">Ligar</span>
+                      <span className="num block text-xs text-muted-foreground">{phone}</span>
+                    </span>
+                  </a>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           <p className="border-t border-dashed border-border pt-4 text-xs text-muted-foreground">
             Ou preencha abaixo que nosso consultor entra em contato:
           </p>
 
-          <Field label="Seu nome" htmlFor="cd-nome" error={errors.nome?.message}>
+          <Field label="Seu nome" htmlFor="cd-nome" error={errors.name?.message}>
             <Input
               id="cd-nome"
               placeholder="Como devemos te chamar?"
-              aria-invalid={Boolean(errors.nome)}
-              {...register("nome")}
+              aria-invalid={Boolean(errors.name)}
+              {...register("name")}
             />
           </Field>
 
-          <Field label="Telefone" htmlFor="cd-tel" error={errors.telefone?.message}>
+          <Field label="Telefone" htmlFor="cd-tel" error={errors.phone?.message}>
             <Input
               id="cd-tel"
               inputMode="tel"
               placeholder="(11) 99999-9999"
-              aria-invalid={Boolean(errors.telefone)}
-              {...register("telefone")}
+              aria-invalid={Boolean(errors.phone)}
+              {...register("phone")}
             />
           </Field>
 
@@ -176,9 +218,16 @@ export function ContactDrawer() {
             />
           </Field>
 
-          <Field label="Mensagem" htmlFor="cd-msg" error={errors.mensagem?.message}>
-            <Textarea id="cd-msg" rows={4} aria-invalid={Boolean(errors.mensagem)} {...register("mensagem")} />
+          <Field label="Mensagem" htmlFor="cd-msg" error={errors.message?.message}>
+            <Textarea
+              id="cd-msg"
+              rows={4}
+              aria-invalid={Boolean(errors.message)}
+              {...register("message")}
+            />
           </Field>
+
+          {submitError && <p className="text-xs text-destructive">{submitError}</p>}
         </form>
 
         <footer className="flex items-center gap-2 border-t border-border px-5 py-4">

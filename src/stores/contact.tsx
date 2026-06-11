@@ -1,11 +1,13 @@
+"use client";
+
 import * as React from "react";
 
-import type { Vehicle } from "@/types/vehicle";
+import type { VehicleSummary } from "@/types/vehicle";
 
 interface ContactContextValue {
   open: boolean;
-  vehicle: Vehicle | null;
-  openContact: (vehicle?: Vehicle | null) => void;
+  vehicle: VehicleSummary | null;
+  openContact: (vehicle?: VehicleSummary | null) => void;
   closeContact: () => void;
 }
 
@@ -13,9 +15,9 @@ const ContactContext = React.createContext<ContactContextValue | null>(null);
 
 export function ContactProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
-  const [vehicle, setVehicle] = React.useState<Vehicle | null>(null);
+  const [vehicle, setVehicle] = React.useState<VehicleSummary | null>(null);
 
-  const openContact = React.useCallback((v?: Vehicle | null) => {
+  const openContact = React.useCallback((v?: VehicleSummary | null) => {
     setVehicle(v ?? null);
     setOpen(true);
   }, []);
