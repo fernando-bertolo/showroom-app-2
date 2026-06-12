@@ -3,6 +3,7 @@
 import * as React from "react";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import { ChevronDown, Search, X } from "lucide-react";
 
@@ -19,16 +20,7 @@ export interface EstoqueFilters {
   minYear?: string;
   maxYear?: string;
   maxKm?: string;
-  sort?: string;
 }
-
-const SORT_OPTIONS = [
-  { value: "", label: "Menor preço" },
-  { value: "price_desc", label: "Maior preço" },
-  { value: "year_desc", label: "Mais novos" },
-  { value: "year_asc", label: "Mais antigos" },
-  { value: "km_asc", label: "Menor quilometragem" },
-] as const;
 
 function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -39,7 +31,7 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
   );
 }
 
-function FilterSelect({ className, children, ...props }: React.ComponentProps<"select">) {
+export function FilterSelect({ className, children, ...props }: React.ComponentProps<"select">) {
   return (
     <div className="relative">
       <select
@@ -71,6 +63,8 @@ export function FilterPanel({
 }) {
   const brands = facets?.brands ?? [];
   const years = facets?.years ?? [];
+  // Ordenação vive fora do form (SortSelect) — preservada via hidden input.
+  const currentSort = useSearchParams().get("sort") ?? "";
 
   const [brand, setBrand] = React.useState(filters.brand ?? "");
   const [model, setModel] = React.useState(filters.model ?? "");
@@ -89,6 +83,8 @@ export function FilterPanel({
 
   return (
     <form action="/estoque" method="GET" className="flex flex-col gap-5">
+      {currentSort && <input type="hidden" name="sort" value={currentSort} />}
+
       <FilterSection title="Marca">
         <FilterSelect name="brand" value={brand} onChange={handleBrandChange} aria-label="Marca">
           <option value="">Todas as marcas</option>
@@ -180,16 +176,6 @@ export function FilterPanel({
           defaultValue={filters.maxKm ?? ""}
           className="num"
         />
-      </FilterSection>
-
-      <FilterSection title="Ordenar por">
-        <FilterSelect name="sort" defaultValue={filters.sort ?? ""} aria-label="Ordenar por">
-          {SORT_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </FilterSelect>
       </FilterSection>
 
       <Button type="submit" variant="outline" size="sm" className="w-full">

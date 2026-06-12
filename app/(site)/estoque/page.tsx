@@ -5,6 +5,7 @@ import { SearchX } from "lucide-react";
 import { FilterPanel, type EstoqueFilters } from "@/components/vehicle/FilterPanel";
 import { Hero } from "@/components/vehicle/Hero";
 import { Pagination } from "@/components/vehicle/Pagination";
+import { SortSelect } from "@/components/vehicle/SortSelect";
 import { VehicleCard } from "@/components/vehicle/VehicleCard";
 import { EmptyState } from "@/design-system/patterns/EmptyState";
 import { ErrorState } from "@/design-system/patterns/ErrorState";
@@ -56,8 +57,8 @@ export default async function EstoquePage({
     minYear: first(sp.minYear),
     maxYear: first(sp.maxYear),
     maxKm: first(sp.maxKm),
-    sort: toSort(first(sp.sort)),
   };
+  const sort = toSort(first(sp.sort));
   const pageParam = toNumber(first(sp.page)) ?? 1; // URL 1-based
 
   const query: VehicleQuery = {
@@ -66,7 +67,7 @@ export default async function EstoquePage({
     minYear: toNumber(filters.minYear),
     maxYear: toNumber(filters.maxYear),
     maxKm: toNumber(filters.maxKm),
-    sort: toSort(filters.sort),
+    sort,
     page: pageParam - 1, // API 0-based
     size: PAGE_SIZE,
   };
@@ -85,6 +86,7 @@ export default async function EstoquePage({
   for (const [key, value] of Object.entries(filters)) {
     if (value) activeParams[key] = value;
   }
+  if (sort) activeParams.sort = sort;
 
   return (
     <>
@@ -110,6 +112,7 @@ export default async function EstoquePage({
                   </span>
                 )}
               </h2>
+              <SortSelect />
             </div>
 
             {!data ? (
