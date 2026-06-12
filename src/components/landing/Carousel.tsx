@@ -18,7 +18,7 @@ function HeroContent() {
   return (
     <>
       <h1 className="mt-4 max-w-xl text-4xl font-bold leading-[1.1] tracking-tight text-white text-balance sm:text-5xl">
-        O seu próximo carro começa aqui
+        Seu próximo carro está aqui
       </h1>
       <p className="mt-4 max-w-lg text-base text-white/80">
         Seminovos selecionados, vistoriados e com procedência garantida. Visite a loja ou fale com
