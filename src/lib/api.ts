@@ -2,6 +2,7 @@ import "server-only";
 
 import { headers } from "next/headers";
 
+import { titleCase } from "@/lib/format";
 import { defaultSlug } from "@/lib/tenant";
 
 import type {
@@ -65,6 +66,15 @@ export interface VehicleQuery {
   sort?: VehicleSort;
 }
 
+/** Marca/modelo chegam da API em caixa irregular — exibimos em Title Case. */
+function normalizeNames<T extends { brandName: string; modelName: string }>(vehicle: T): T {
+  return {
+    ...vehicle,
+    brandName: titleCase(vehicle.brandName),
+    modelName: titleCase(vehicle.modelName),
+  };
+}
+
 /** Listagem pública paginada (página 0-indexed na API, máx. 60 por página). */
 export async function getVehicles(
   slug: string,
@@ -77,16 +87,25 @@ export async function getVehicles(
     }
   }
   const qs = params.toString();
-  return fetchJson<PageResponse<VehicleSummary>>(
+  const data = await fetchJson<PageResponse<VehicleSummary>>(
     `/showroom/${encodeURIComponent(slug)}/vehicles${qs ? `?${qs}` : ""}`,
   );
+  return data ? { ...data, content: data.content.map(normalizeNames) } : null;
 }
 
 /** Marcas/modelos/anos distintos do estoque — opções dos selects de filtro. */
 export async function getVehicleFacets(slug: string): Promise<VehicleFacets | null> {
-  return fetchJson<VehicleFacets>(
+  const data = await fetchJson<VehicleFacets>(
     `/showroom/${encodeURIComponent(slug)}/vehicles/facets`,
   );
+  if (!data) return null;
+  return {
+    ...data,
+    brands: data.brands.map((b) => ({
+      name: titleCase(b.name),
+      models: b.models.map(titleCase),
+    })),
+  };
 }
 
 /** Detalhe público de um veículo. null em 404. */
@@ -94,7 +113,8 @@ export async function getVehicle(
   slug: string,
   publicId: string,
 ): Promise<VehicleDetail | null> {
-  return fetchJson<VehicleDetail>(
+  const data = await fetchJson<VehicleDetail>(
     `/showroom/${encodeURIComponent(slug)}/vehicles/${encodeURIComponent(publicId)}`,
   );
+  return data ? normalizeNames(data) : null;
 }

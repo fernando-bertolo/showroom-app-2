@@ -23,6 +23,16 @@ export function formatNumber(value: number): string {
   return value.toLocaleString("pt-BR");
 }
 
+/**
+ * Title Case por palavra: "SPACE FOX" / "space fox" → "Space Fox".
+ * Considera espaço, hífen e barra como separadores ("T-CROSS" → "T-Cross").
+ */
+export function titleCase(value: string): string {
+  return value
+    .toLocaleLowerCase("pt-BR")
+    .replace(/(^|[\s\-/])\p{L}/gu, (match) => match.toLocaleUpperCase("pt-BR"));
+}
+
 /** Mantém apenas dígitos (telefones vindos da API podem ter máscara). */
 export function digitsOnly(value: string): string {
   return value.replace(/\D/g, "");
