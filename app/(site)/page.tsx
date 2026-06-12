@@ -114,13 +114,15 @@ export default async function LandingPage() {
             </h2>
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground">
               <p>
-                A {tradeName} trabalha com uma ideia simples: tornar a compra de um seminovo tão
-                tranquila quanto comprar um carro zero — com transparência de preço, histórico
-                completo do veículo e suporte real no pós-venda.
+                Na {tradeName}, transparência e confiança vêm em primeiro lugar.              
               </p>
               <p>
-                Cada carro que entra na loja passa por vistoria cautelar, laudo de procedência e
-                limpeza completa. Sem histórico de sinistro grave, sem pendências de documentação.
+                Cada veículo anunciado passa por vistoria cautelar, análise de procedência e preparação completa, 
+                garantindo mais segurança e tranquilidade na sua decisão de compra. Além disso, todos os automóveis possuem documentação regularizada e histórico verificado.
+              </p>
+              <p>
+                Acreditamos que uma boa negociação começa com informações claras e continua com um 
+                atendimento que permanece presente mesmo após a entrega das chaves.
               </p>
             </div>
             <div className="mt-6 flex flex-wrap gap-3">

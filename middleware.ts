@@ -1,14 +1,20 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { resolveSlug } from "@/lib/tenant";
+import { resolveSlugByCustomDomain } from "@/lib/customDomain";
+import { defaultSlug, deriveSlugFromHost } from "@/lib/tenant";
 
 /**
- * Multi-tenant por subdomínio: {slug}.byeauto.com.br (ou {slug}.localhost:3001
- * em dev). O slug resolvido é propagado para server components e route
- * handlers via request header `x-branch-slug`.
+ * Multi-tenant por Host: subdomínio {slug}.byeauto.com.br (ou
+ * {slug}.localhost:3001 em dev) e domínio próprio do lojista
+ * (ex: minhaloja.com.br, resolvido via API com cache). O slug resolvido é
+ * propagado para server components e route handlers via `x-branch-slug`.
  */
-export function middleware(request: NextRequest) {
-  const slug = resolveSlug(request.headers.get("host"));
+export async function middleware(request: NextRequest) {
+  const host = request.headers.get("host");
+  const slug =
+    deriveSlugFromHost(host) ??
+    (await resolveSlugByCustomDomain(host)) ??
+    defaultSlug();
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-branch-slug", slug);
