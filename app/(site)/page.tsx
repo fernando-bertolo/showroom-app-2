@@ -58,43 +58,45 @@ export default async function LandingPage() {
 
       {/* Stats strip */}
       <div className="bg-primary text-primary-foreground">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-10 gap-y-6 px-4 py-8 sm:px-6 lg:justify-between lg:px-8">
-          <div className="flex items-center gap-3">
-            <span className="flex size-12 items-center justify-center rounded-2xl bg-white/15">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 gap-y-6 px-4 py-8 sm:px-6 lg:grid-cols-4 lg:gap-x-10 lg:px-8">
+          <div className="flex flex-col items-start gap-2.5 sm:flex-row sm:items-center sm:gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/15 sm:size-12 sm:rounded-2xl">
               <Car className="size-5" />
             </span>
             <div>
-              <div className="num text-2xl font-bold tracking-tight">{formatNumber(total)}</div>
-              <div className="text-sm text-primary-foreground/80">
+              <div className="num text-lg font-bold tracking-tight sm:text-2xl">
+                {formatNumber(total)}
+              </div>
+              <div className="text-xs text-primary-foreground/80 sm:text-sm">
                 {total === 1 ? "veículo em estoque" : "veículos em estoque"}
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="flex size-12 items-center justify-center rounded-2xl bg-white/15">
+          <div className="flex flex-col items-start gap-2.5 sm:flex-row sm:items-center sm:gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/15 sm:size-12 sm:rounded-2xl">
               <ShieldCheck className="size-5" />
             </span>
             <div>
-              <div className="text-2xl font-bold tracking-tight">Procedência</div>
-              <div className="text-sm text-primary-foreground/80">histórico verificado</div>
+              <div className="text-lg font-bold tracking-tight sm:text-2xl">Procedência</div>
+              <div className="text-xs text-primary-foreground/80 sm:text-sm">histórico verificado</div>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="flex size-12 items-center justify-center rounded-2xl bg-white/15">
+          <div className="flex flex-col items-start gap-2.5 sm:flex-row sm:items-center sm:gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/15 sm:size-12 sm:rounded-2xl">
               <Banknote className="size-5" />
             </span>
             <div>
-              <div className="text-2xl font-bold tracking-tight">Financiamento</div>
-              <div className="text-sm text-primary-foreground/80">sujeito à análise do banco</div>
+              <div className="text-lg font-bold tracking-tight sm:text-2xl">Financiamento</div>
+              <div className="text-xs text-primary-foreground/80 sm:text-sm">sujeito à análise do banco</div>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="flex size-12 items-center justify-center rounded-2xl bg-white/15">
+          <div className="flex flex-col items-start gap-2.5 sm:flex-row sm:items-center sm:gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/15 sm:size-12 sm:rounded-2xl">
               <Handshake className="size-5" />
             </span>
             <div>
-              <div className="text-2xl font-bold tracking-tight">Troca e compra</div>
-              <div className="text-sm text-primary-foreground/80">avaliamos o seu usado</div>
+              <div className="text-lg font-bold tracking-tight sm:text-2xl">Troca e compra</div>
+              <div className="text-xs text-primary-foreground/80 sm:text-sm">avaliamos o seu usado</div>
             </div>
           </div>
         </div>

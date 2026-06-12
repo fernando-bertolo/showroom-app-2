@@ -1,9 +1,11 @@
 "use client";
 
+import * as React from "react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { Heart, MessageCircle, Moon, Phone, Sun } from "lucide-react";
+import { Heart, Menu, MessageCircle, Moon, Phone, Sun, X } from "lucide-react";
 
 import { Button } from "@/design-system/primitives/button";
 import { telHref } from "@/lib/format";
@@ -31,13 +33,30 @@ export function Header({ tradeName, logoUrl, phone }: HeaderProps) {
   const { count } = useFavorites();
   const { openContact } = useContact();
   const { theme, toggle } = useTheme();
+  const [menuOpen, setMenuOpen] = React.useState(false);
+
+  // Fecha o menu mobile ao navegar para outra página.
+  React.useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
   const isActive = (to: string, exact: boolean) =>
     exact ? pathname === to : pathname === to || pathname.startsWith(`${to}/`);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 md:gap-6 lg:px-8">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          className="md:hidden"
+          aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((v) => !v)}
+        >
+          {menuOpen ? <X /> : <Menu />}
+        </Button>
+
         <Link
           href="/"
           className="flex shrink-0 items-center rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
@@ -106,6 +125,34 @@ export function Header({ tradeName, logoUrl, phone }: HeaderProps) {
           </Button>
         </div>
       </div>
+
+      {menuOpen && (
+        <nav className="border-t border-border bg-background md:hidden">
+          <div className="mx-auto max-w-7xl space-y-1 px-4 py-3 sm:px-6">
+            {NAV.map((item) => (
+              <Link
+                key={item.to}
+                href={item.to}
+                className={cn(
+                  "block rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
+                  isActive(item.to, item.exact) && "bg-accent text-foreground",
+                )}
+              >
+                {item.label}
+              </Link>
+            ))}
+            {phone && (
+              <a
+                href={telHref(phone)}
+                className="flex items-center gap-2 border-t border-border px-3 pt-3 pb-1.5 text-sm font-medium"
+              >
+                <Phone className="size-4 text-primary" />
+                <span className="num">{phone}</span>
+              </a>
+            )}
+          </div>
+        </nav>
+      )}
     </header>
   );
 }
