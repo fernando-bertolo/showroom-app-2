@@ -11,7 +11,7 @@ export function Hero({ total }: HeroProps) {
     <section className="border-b border-border bg-sidebar">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <h1 className="max-w-2xl text-3xl font-bold tracking-tight text-balance sm:text-4xl">
-          Encontre o carro certo, sem rodeios.
+          Encontre o carro certo para você.
         </h1>
         <p className="mt-3 max-w-xl text-muted-foreground">
           <span className="num">{total != null ? formatNumber(total) : "—"}</span> veículos
