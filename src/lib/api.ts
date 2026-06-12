@@ -8,6 +8,7 @@ import type {
   PageResponse,
   Storefront,
   VehicleDetail,
+  VehicleFacets,
   VehicleSummary,
 } from "@/types/vehicle";
 
@@ -45,16 +46,23 @@ export async function getStorefront(slug: string): Promise<Storefront | null> {
   return fetchJson<Storefront>(`/showroom/${encodeURIComponent(slug)}`);
 }
 
+export type VehicleSort =
+  | "price_asc"
+  | "price_desc"
+  | "year_desc"
+  | "year_asc"
+  | "km_asc"
+  | "km_desc";
+
 export interface VehicleQuery {
   page?: number;
   size?: number;
   brand?: string;
   model?: string;
-  year?: number;
-  minPrice?: number;
-  maxPrice?: number;
-  minKm?: number;
+  minYear?: number;
+  maxYear?: number;
   maxKm?: number;
+  sort?: VehicleSort;
 }
 
 /** Listagem pública paginada (página 0-indexed na API, máx. 60 por página). */
@@ -71,6 +79,13 @@ export async function getVehicles(
   const qs = params.toString();
   return fetchJson<PageResponse<VehicleSummary>>(
     `/showroom/${encodeURIComponent(slug)}/vehicles${qs ? `?${qs}` : ""}`,
+  );
+}
+
+/** Marcas/modelos/anos distintos do estoque — opções dos selects de filtro. */
+export async function getVehicleFacets(slug: string): Promise<VehicleFacets | null> {
+  return fetchJson<VehicleFacets>(
+    `/showroom/${encodeURIComponent(slug)}/vehicles/facets`,
   );
 }
 

@@ -58,11 +58,6 @@ export function Footer({ storefront }: { storefront: Storefront }) {
                 </Link>
               </li>
               <li>
-                <Link href="/financiamento" className="transition-colors hover:text-foreground">
-                  Financiamento
-                </Link>
-              </li>
-              <li>
                 <Link href="/vender" className="transition-colors hover:text-foreground">
                   Venda seu carro
                 </Link>

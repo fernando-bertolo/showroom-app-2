@@ -24,7 +24,7 @@ export const leadFormSchema = z.object({
 
 export type LeadFormValues = z.infer<typeof leadFormSchema>;
 
-export type LeadSource = "VEHICLE_DETAIL" | "CONTACT" | "FINANCING";
+export type LeadSource = "VEHICLE_DETAIL" | "CONTACT";
 
 export interface LeadPayload {
   name: string;

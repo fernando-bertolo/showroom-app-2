@@ -12,7 +12,6 @@ integrada à API real do backend Spring.
 | `/estoque` | Grade de veículos com filtros via search params (form GET, funciona sem JS) |
 | `/veiculo/[id]` | Detalhe do veículo (galeria, ficha, opcionais, form de interesse) |
 | `/vender` | **Venda seu carro** — wizard em 4 passos → POST sell-offers |
-| `/financiamento` | Simulador (Tabela Price) + lead de financiamento |
 | `/favoritos` | Veículos salvos (localStorage, client) |
 | `/onde-estamos` | Endereço e horários reais da loja |
 
@@ -61,13 +60,13 @@ app/                       App Router (páginas server + route handlers)
 │   ├── page.tsx           landing
 │   ├── estoque/           listagem com filtros e paginação por links
 │   ├── veiculo/[id]/      detalhe + generateMetadata/OG
-│   ├── vender/ financiamento/ favoritos/ onde-estamos/
+│   ├── vender/ favoritos/ onde-estamos/
 ├── api/leads/             proxy POST → API (valida e repassa)
 ├── api/sell-offers/       proxy POST → API
 ├── sitemap.ts robots.ts   dinâmicos por tenant
 src/
 ├── design-system/         foundations (CSS), primitives, patterns
-├── components/            layout, landing, vehicle, contact, financing, sell, form
+├── components/            layout, landing, vehicle, contact, sell, form
 ├── stores/                contexts client: theme, favorites, contact, toast
 ├── types/                 vehicle (payloads da API), contact, sell
 └── lib/                   api (server-only), tenant, skin, labels, format, utils

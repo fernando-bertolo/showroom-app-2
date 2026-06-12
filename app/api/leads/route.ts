@@ -4,7 +4,7 @@ import { resolveSlug } from "@/lib/tenant";
 
 const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8080/api/v1";
 
-const ALLOWED_SOURCES = new Set(["VEHICLE_DETAIL", "CONTACT", "FINANCING"]);
+const ALLOWED_SOURCES = new Set(["VEHICLE_DETAIL", "CONTACT"]);
 
 /**
  * Proxy same-origin para POST /showroom/{slug}/leads — o browser nunca fala

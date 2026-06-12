@@ -17,7 +17,6 @@ import { useTheme } from "@/stores/theme";
 const NAV = [
   { to: "/", label: "Início", exact: true },
   { to: "/estoque", label: "Estoque", exact: false },
-  { to: "/financiamento", label: "Financiamento", exact: false },
   { to: "/vender", label: "Venda seu carro", exact: false },
   { to: "/onde-estamos", label: "Onde estamos", exact: false },
 ] as const;

@@ -8,7 +8,7 @@ import { Pagination } from "@/components/vehicle/Pagination";
 import { VehicleCard } from "@/components/vehicle/VehicleCard";
 import { EmptyState } from "@/design-system/patterns/EmptyState";
 import { ErrorState } from "@/design-system/patterns/ErrorState";
-import { getSlug, getVehicles, type VehicleQuery } from "@/lib/api";
+import { getSlug, getVehicleFacets, getVehicles, type VehicleQuery, type VehicleSort } from "@/lib/api";
 import { formatNumber } from "@/lib/format";
 
 export const metadata: Metadata = {
@@ -30,6 +30,19 @@ function toNumber(value: string | undefined): number | undefined {
   return Number.isFinite(n) && n > 0 ? n : undefined;
 }
 
+const VALID_SORTS = new Set<VehicleSort>([
+  "price_asc",
+  "price_desc",
+  "year_desc",
+  "year_asc",
+  "km_asc",
+  "km_desc",
+]);
+
+function toSort(value: string | undefined): VehicleSort | undefined {
+  return value && VALID_SORTS.has(value as VehicleSort) ? (value as VehicleSort) : undefined;
+}
+
 export default async function EstoquePage({
   searchParams,
 }: {
@@ -40,30 +53,29 @@ export default async function EstoquePage({
   const filters: EstoqueFilters = {
     brand: first(sp.brand),
     model: first(sp.model),
-    year: first(sp.year),
-    minPrice: first(sp.minPrice),
-    maxPrice: first(sp.maxPrice),
-    minKm: first(sp.minKm),
+    minYear: first(sp.minYear),
+    maxYear: first(sp.maxYear),
     maxKm: first(sp.maxKm),
+    sort: toSort(first(sp.sort)),
   };
   const pageParam = toNumber(first(sp.page)) ?? 1; // URL 1-based
 
   const query: VehicleQuery = {
     brand: filters.brand,
     model: filters.model,
-    year: toNumber(filters.year),
-    minPrice: toNumber(filters.minPrice),
-    maxPrice: toNumber(filters.maxPrice),
-    minKm: toNumber(filters.minKm),
+    minYear: toNumber(filters.minYear),
+    maxYear: toNumber(filters.maxYear),
     maxKm: toNumber(filters.maxKm),
+    sort: toSort(filters.sort),
     page: pageParam - 1, // API 0-based
     size: PAGE_SIZE,
   };
 
   const slug = await getSlug();
-  const [data, unfiltered] = await Promise.all([
+  const [data, unfiltered, facets] = await Promise.all([
     getVehicles(slug, query),
     getVehicles(slug, { size: 1, page: 0 }),
+    getVehicleFacets(slug),
   ]);
 
   const total = unfiltered?.metadata.totalElements ?? null;
@@ -81,7 +93,11 @@ export default async function EstoquePage({
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[260px_1fr]">
           <div className="lg:sticky lg:top-20 lg:self-start">
-            <FilterPanel filters={filters} />
+            <FilterPanel
+              key={Object.values(filters).join("|")}
+              filters={filters}
+              facets={facets}
+            />
           </div>
 
           <section>

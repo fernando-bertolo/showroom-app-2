@@ -35,6 +35,18 @@ export interface VehicleSummary {
   coverImage: string | null;
 }
 
+/** Marca presente no estoque, com os modelos disponíveis dela. */
+export interface BrandFacet {
+  name: string;
+  models: string[];
+}
+
+/** Valores distintos do estoque (GET /vehicles/facets) — alimentam os selects de filtro. */
+export interface VehicleFacets {
+  brands: BrandFacet[];
+  years: number[];
+}
+
 /** Detalhe público de um veículo (sem coverImage; usa images[]). */
 export interface VehicleDetail extends Omit<VehicleSummary, "coverImage"> {
   engine: string | null;

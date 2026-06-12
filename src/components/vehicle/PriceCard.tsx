@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import { Heart, MessageCircle } from "lucide-react";
 
 import { LeadForm } from "@/components/contact/LeadForm";
@@ -33,16 +31,6 @@ export function PriceCard({ vehicle, whatsapp }: PriceCardProps) {
       </p>
       <p className="num mt-1 text-3xl font-bold tracking-tight">
         {formatCurrencyBRL(vehicle.salePrice)}
-      </p>
-
-      <p className="mt-3 text-xs text-muted-foreground">
-        ou em até <span className="num">60x</span> —{" "}
-        <Link
-          href={`/financiamento?valor=${vehicle.salePrice}`}
-          className="text-primary underline underline-offset-2"
-        >
-          simule o financiamento
-        </Link>
       </p>
 
       <hr className="my-5 border-border" />
