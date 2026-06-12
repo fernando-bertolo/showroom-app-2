@@ -151,7 +151,8 @@ export default async function VehicleDetailPage({ params }: PageProps) {
       </nav>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
-        <div>
+        {/* min-w-0: a faixa de thumbnails (overflow-x) não pode ditar a largura da coluna. */}
+        <div className="min-w-0">
           <Gallery vehicle={summary} images={vehicle.images} />
 
           <div className="mt-7">
