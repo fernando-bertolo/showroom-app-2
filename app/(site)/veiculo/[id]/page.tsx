@@ -18,6 +18,7 @@ import {
 import { Gallery } from "@/components/vehicle/Gallery";
 import { PriceCard } from "@/components/vehicle/PriceCard";
 import { IconBadge } from "@/design-system/patterns/IconBadge";
+import { Button } from "@/design-system/primitives/button";
 import { Card } from "@/design-system/primitives/card";
 import { getSlug, getStorefront, getVehicle } from "@/lib/api";
 import { formatCurrencyBRL, formatKm } from "@/lib/format";
@@ -210,6 +211,11 @@ export default async function VehicleDetailPage({ params }: PageProps) {
 
         <aside className="flex flex-col gap-4 lg:sticky lg:top-20 lg:self-start">
           <PriceCard vehicle={summary} whatsapp={storefront?.whatsapp ?? null} />
+          <Button variant="outline" className="w-full" asChild>
+            <Link href={`/financiamento?veiculo=${encodeURIComponent(id)}`}>
+              <Banknote /> Simular financiamento
+            </Link>
+          </Button>
           <Guarantees />
         </aside>
       </div>
