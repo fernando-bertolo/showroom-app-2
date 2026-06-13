@@ -213,36 +213,42 @@ const CONJUGE_SECTIONS: Section[] = [
 
 function StepIndicator({ step }: { step: number }) {
   return (
-    <ol className="mb-6 flex items-center gap-2">
-      {STEP_TITLES.map((title, idx) => {
-        const n = idx + 1;
-        const done = step > n;
-        const current = step === n;
-        return (
-          <li key={title} className="flex flex-1 items-center gap-2">
-            <span
-              className={cn(
-                "flex size-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold transition-colors",
-                done && "border-primary bg-primary text-primary-foreground",
-                current && "border-primary text-primary",
-                !done && !current && "border-border text-muted-foreground",
-              )}
-            >
-              {done ? <Check className="size-3.5" /> : n}
-            </span>
-            <span
-              className={cn(
-                "hidden text-xs font-medium md:block",
-                current ? "text-foreground" : "text-muted-foreground",
-              )}
-            >
-              {title}
-            </span>
-            {n < TOTAL && <span className="ml-1 hidden h-px flex-1 bg-border sm:block" />}
-          </li>
-        );
-      })}
-    </ol>
+    <div className="mb-6">
+      <ol className="flex items-center gap-2">
+        {STEP_TITLES.map((title, idx) => {
+          const n = idx + 1;
+          const done = step > n;
+          const current = step === n;
+          return (
+            <li key={title} className="flex flex-1 items-center gap-2">
+              <span
+                className={cn(
+                  "flex size-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold transition-colors",
+                  done && "border-primary bg-primary text-primary-foreground",
+                  current && "border-primary text-primary",
+                  !done && !current && "border-border text-muted-foreground",
+                )}
+              >
+                {done ? <Check className="size-3.5" /> : n}
+              </span>
+              <span
+                className={cn(
+                  "hidden text-xs font-medium md:block",
+                  current ? "text-foreground" : "text-muted-foreground",
+                )}
+              >
+                {title}
+              </span>
+              {n < TOTAL && <span className="ml-1 hidden h-px flex-1 bg-border sm:block" />}
+            </li>
+          );
+        })}
+      </ol>
+      {/* No mobile os títulos ao lado dos números ficam ocultos; mostramos o da etapa atual aqui. */}
+      <p className="mt-2 text-sm font-semibold text-foreground md:hidden">
+        {step}. {STEP_TITLES[step - 1]}
+      </p>
+    </div>
   );
 }
 
