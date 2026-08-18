@@ -51,6 +51,8 @@ export interface VehicleFacets {
 export interface VehicleDetail extends Omit<VehicleSummary, "coverImage"> {
   engine: string | null;
   transmission: string | null;
+  /** Descrição de anúncio escrita pela loja; null enquanto não preenchida. */
+  adDescription: string | null;
   optionals: string[];
   images: string[];
 }

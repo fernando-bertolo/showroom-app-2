@@ -52,9 +52,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 function toSummary(vehicle: VehicleDetail): VehicleSummary {
-  const { engine, transmission, optionals, images, ...rest } = vehicle;
+  const { engine, transmission, adDescription, optionals, images, ...rest } = vehicle;
   void engine;
   void transmission;
+  void adDescription;
   void optionals;
   return { ...rest, coverImage: images[0] ?? null };
 }
@@ -190,6 +191,15 @@ export default async function VehicleDetailPage({ params }: PageProps) {
             </h2>
             <SpecSheet vehicle={vehicle} />
           </Card>
+
+          {vehicle.adDescription?.trim() && (
+            <Card className="mt-4 gap-0 py-0">
+              <h2 className="border-b border-border px-6 py-4 text-lg font-semibold">Descrição</h2>
+              <p className="px-6 py-5 text-sm leading-relaxed whitespace-pre-line">
+                {vehicle.adDescription}
+              </p>
+            </Card>
+          )}
 
           {vehicle.optionals.length > 0 && (
             <Card className="mt-4 gap-0 py-0">
